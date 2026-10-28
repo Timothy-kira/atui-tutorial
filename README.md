@@ -1,11 +1,15 @@
 # atui教学
 
-这份仓库整理了本次 A2UI 餐厅 Agent 活动的基础材料，供课后阅读、运行和继续修改。
+本仓库用于整理 A2UI 餐厅 Agent 活动的配套材料。
+
+后续会补充供学员实操使用的基础开发代码，提供项目结构和基础功能，让大家在此基础上继续完成练习，不需要从零搭建。这部分起始代码目前尚待制作。
+
+目前仓库中已有图文讲义、截图、参考示例和前端交互演示。
 
 ## 材料入口
 
 - [活动图文讲义](docs/A2UI餐厅Agent图文稿.md)：按章节整理的讲解与 42 张页面、长回答和交互截图。
-- [餐厅 Agent 示例](examples/maison-ai/README.md)：ADK、AG-UI 与 A2UI 的前后端集成代码，包含菜单数据、业务工具、组件目录和启动脚本。
+- [餐厅 Agent 参考示例](examples/maison-ai/README.md)：ADK、AG-UI 与 A2UI 的前后端集成参考，包含菜单数据、业务工具、组件目录和启动脚本。
 - [动手步骤](examples/maison-ai/WORKSHOP.md)：课堂操作流程与练习。
 - [前端交互演示](showcase/index.html)：Explore、Recommend、Explain、Order 的展示界面和本地图片。
 
