@@ -1,6 +1,8 @@
 # 从对话到界面：用 ADK、AG-UI 和 A2UI 构建餐厅 Agent
 
-本次活动的配套仓库是 [atui教学（atui-tutorial）](https://github.com/Timothy-kira/atui-tutorial)。后续会在仓库中补充供实操使用的基础开发代码，让大家在已有项目结构和基础功能上继续完成练习，不需要从零搭建。目前这部分起始代码尚待制作。
+本次活动的配套仓库是 [atui教学（atui-tutorial）](https://github.com/Timothy-kira/atui-tutorial)，后续会补充基础开发代码。
+
+为了方便大家，如果 token 不够的话，可以以这个项目为基础开始构建。但是，我建议大家自己从 0 搭建。
 
 ## 一、开场
 
