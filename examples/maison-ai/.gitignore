@@ -1,0 +1,12 @@
+.env
+.env.*
+!.env.example
+.local/
+.venv/
+node_modules/
+.next/
+__pycache__/
+.pytest_cache/
+test-results/
+playwright-report/
+references/

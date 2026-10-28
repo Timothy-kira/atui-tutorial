@@ -1,0 +1,57 @@
+.workflow-form{padding:24px;border:1px solid var(--line);border-radius:24px;background:#fff}
+.workflow-form fieldset{min-width:0;padding:0;margin:0;border:0}
+.workflow-title h3{font-size:22px;letter-spacing:-.025em;margin:0 0 8px;font-weight:550}
+.workflow-title p{font-size:13px;color:var(--muted);margin:0 0 22px;line-height:1.5}
+.workflow-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.workflow-fields label,.calorie-controls label{display:flex;flex-direction:column;gap:8px;font-size:12px;color:var(--muted);min-width:0}
+.workflow-fields input,.workflow-fields select,.calorie-controls input{width:100%;min-width:0;border:1px solid var(--line);border-radius:12px;background:#f8f9fa;color:var(--ink);padding:11px 12px;font-size:14px;min-height:42px}
+.allergen-filter{margin-top:22px;font-size:12px;color:var(--muted)}
+.allergen-filter>div{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.allergen-filter label{display:flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:999px;padding:8px 11px;color:var(--ink);font-size:12px;text-transform:capitalize;cursor:pointer}
+.allergen-filter label:has(input:checked){background:var(--pale);border-color:#a8c7fa;color:#185abc}
+.allergen-filter input{accent-color:var(--blue);margin:0}
+.workflow-note{font-size:11px;color:var(--muted);line-height:1.6;margin:18px 0}
+.serving-info{display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--muted);line-height:1.5}
+.serving-info strong{font-size:14px;color:var(--ink);font-weight:550}
+.serving-info small{font-size:11px}
+.nutrition-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:16px;border-radius:20px;background:#f1f6ff;padding:22px}
+.nutrition-summary>div{display:flex;flex-direction:column;gap:12px}
+.nutrition-summary span{font-size:12px;color:var(--muted)}
+.nutrition-summary strong{font-size:30px;font-weight:550;letter-spacing:-.035em;color:#185abc}
+.nutrition-summary strong small{font-size:12px;font-weight:400;letter-spacing:0}
+.nutrition-summary p{grid-column:1/-1;font-size:11px;color:var(--muted);line-height:1.6;margin:0}
+.calorie-controls{display:flex;align-items:flex-end;gap:12px;margin-bottom:8px}
+.calorie-controls label{width:110px}
+.reservation-confirmation{display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;padding:20px 0}
+.reservation-confirmation h4{font-size:21px;font-weight:550;margin:0}
+.reservation-confirmation p,.reservation-confirmation small{font-size:12px;color:var(--muted);line-height:1.6;margin:0}
+.reservation-confirmation strong{color:var(--blue);font-size:20px;font-weight:550}
+.dining-workflows{display:flex;gap:8px;align-items:center;height:42px;margin-bottom:14px;overflow-x:auto;flex:none}
+.dining-workflows button{border:1px solid var(--line);border-radius:999px;background:#fff;padding:9px 13px;font-size:12px;color:#42464d;white-space:nowrap;flex:none}
+.dining-workflows button:hover:not(:disabled){background:var(--pale);border-color:#a8c7fa}
+.agent-view .agent-content{height:100%}
+.inline-a2ui{width:100%;min-width:0;margin:16px 0;overflow-anchor:none}
+.maison-chat{overflow-anchor:none}
+@media(max-width:760px){.workflow-form{padding:18px;border-radius:20px}.workflow-fields{gap:12px}.workflow-fields label{font-size:11px}.dining-workflows{padding:0 12px}.dining-workflows button{font-size:11px;padding:8px 11px}}
+/* Conversation dishes use compact list rows rather than large tiles. */
+.inline-a2ui .dish-grid{display:flex;flex-direction:column;gap:12px!important}
+.inline-a2ui .dish-card{display:grid;grid-template-columns:88px minmax(0,1fr) 126px;column-gap:16px;row-gap:7px;padding:16px;border-radius:18px;align-items:start}
+.inline-a2ui .dish-card>h3{grid-column:2/-1;margin:0;font-size:16px;line-height:1.3;letter-spacing:-.015em}
+.inline-a2ui .dish-card>.surface-column{display:contents}
+.inline-a2ui .dish-card .dish-photo{grid-column:1;grid-row:1/8;width:88px;height:88px;aspect-ratio:1;border-radius:12px}
+.inline-a2ui .dish-card .price-badge{grid-column:2;font-size:15px}
+.inline-a2ui .dish-card .dietary-tags,.inline-a2ui .dish-card .serving-info,.inline-a2ui .dish-card .option-control,.inline-a2ui .dish-card .surface-copy,.inline-a2ui .dish-card .dish-facts{grid-column:2}
+.inline-a2ui .dish-card .dietary-tags:empty{display:none}
+.inline-a2ui .dish-card .serving-info{gap:3px;font-size:11px}
+.inline-a2ui .dish-card .serving-info strong{font-size:12px;font-weight:500}
+.inline-a2ui .dish-card .quantity-control{grid-column:3;grid-row:2;margin:0;justify-content:flex-end}
+.inline-a2ui .dish-card .quantity-control>span{display:none}
+.inline-a2ui .dish-card .quantity-control>div{gap:10px}
+.inline-a2ui .dish-card .primary-button{grid-column:3;grid-row:3/5;padding:9px 10px;font-size:12px;align-self:end}
+.inline-a2ui .workflow-form{padding:18px;border-radius:18px}
+.inline-a2ui .workflow-title h3{font-size:18px}
+@media(max-width:520px){
+ .inline-a2ui .dish-card{grid-template-columns:64px minmax(0,1fr);gap:8px 12px;padding:12px}
+ .inline-a2ui .dish-card .dish-photo{width:64px;height:64px}
+ .inline-a2ui .dish-card .quantity-control,.inline-a2ui .dish-card .primary-button{grid-column:2;grid-row:auto;justify-content:flex-start;width:auto;justify-self:start}
+}

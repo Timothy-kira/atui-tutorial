@@ -1,0 +1,11 @@
+'use client';
+import {createContext,useContext} from 'react';
+export type Dish={id:string;name:string;price:number;image:string;description:string;category:string;vegetarian:boolean;vegan:boolean;available:boolean;options:Record<string,string[]>;preparation:string;calories_kcal:number;servings:{people:number;style:string;note:string};allergens:string[];allergen_note:string;nutrition_basis:string};
+export type Selection={quantity?:number;options?:Record<string,string>};
+export type UIAction={name:string;context?:Record<string,unknown>;surfaceId?:string};
+export const DiningContext=createContext<{menu:Dish[];selections:Record<string,Selection>;change:(dishId:string,patch:Selection,surfaceId:string)=>void;send:(action:UIAction)=>void;busy:boolean}>({menu:[],selections:{},change:()=>{},send:()=>{},busy:false});
+export const SurfaceContext=createContext('');
+export const SurfaceLoadContext=createContext<'loading'|'ready'|'failed'>('ready');
+export const useDining=()=>{const dining=useContext(DiningContext),surfaceId=useContext(SurfaceContext);return {...dining,send:(action:UIAction)=>dining.send({...action,surfaceId:action.surfaceId||surfaceId})};};
+export const useSurface=()=>useContext(SurfaceContext);
+export const useSurfaceLoad=()=>useContext(SurfaceLoadContext);

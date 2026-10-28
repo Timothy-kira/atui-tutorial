@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Maison AI — Showcase</title>
+  <link rel="stylesheet" href="showcase.css?v=pickup-minimal">
+</head>
+<body>
+  <header class="view-navigation">
+    <div class="view-tabs" role="tablist" aria-label="Pickup ordering view">
+      <span class="view-tab-indicator" aria-hidden="true"></span>
+      <button id="menu-tab" role="tab" aria-controls="menu-view" aria-selected="true">Menu</button>
+      <button id="agent-tab" role="tab" aria-controls="agent-view" aria-selected="false">Agent</button>
+    </div>
+    <button class="table-toggle" aria-label="Review your pickup order"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14l1 15H4L5 7ZM8 7V5a4 4 0 0 1 8 0v2"/></svg><span id="cart-count">0</span></button>
+  </header>
+  <main id="menu-view" role="tabpanel" aria-labelledby="menu-tab">
+    <nav class="menu-categories" aria-label="Menu categories"></nav>
+    <div class="menu-list"></div>
+  </main>
+  <main id="agent-view" role="tabpanel" aria-labelledby="agent-tab" hidden>
+    <div class="agent-layout">
+      <section class="conversation" aria-label="Conversation">
+        <div class="chat-welcome">
+          <p class="eyebrow">MAISON PICKUP ASSISTANT</p>
+          <h1>Good evening. What sounds good?</h1>
+          <p>I can recommend dishes, check ingredients and allergens, or help you<br>place an order for pickup.</p>
+          <div class="suggested-prompts">
+            <button data-prompt="Recommend dinner for two">Recommend dinner for two <kbd>↵</kbd></button>
+            <button data-prompt="Show me vegetarian mains">Show me vegetarian mains <kbd>↵</kbd></button>
+            <button data-prompt="What’s in the lemonade?">What’s in the lemonade? <kbd>↵</kbd></button>
+            <button data-prompt="Build a meal under S$60">Build a meal under S$60 <kbd>↵</kbd></button>
+          </div>
+        </div>
+        <div class="messages" aria-live="polite"></div>
+        <form class="composer"><button type="button" class="attachment" aria-label="Add attachment"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v16M4 12h16"/></svg></button><textarea rows="1" aria-label="Message the pickup assistant" placeholder="What sounds good tonight?"></textarea><button class="send" aria-label="Send message"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20V4m-7 7 7-7 7 7"/></svg></button></form>
+        <p class="disclaimer">AI can make mistakes. Please verify important information.</p>
+      </section>
+      <aside class="workspace" aria-label="Interactive pickup order panel" hidden><header><h2 id="workspace-title"></h2><button class="workspace-close" aria-label="Close panel">×</button></header><div class="workspace-body"></div></aside>
+    </div>
+  </main>
+  <dialog class="dish-dialog"><button class="dialog-close" aria-label="Close dish details">×</button><div class="dish-detail"></div></dialog>
+  <script src="menu-data.js"></script>
+  <script src="showcase.js?v=local-narration-clock"></script>
+  <script src="flow-controller.js?v=narration-cues"></script>
+</body>
+</html>
