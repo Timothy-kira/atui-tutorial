@@ -9,7 +9,17 @@ def test_fixture_and_dietary_constraints():
     result=get_menu(dietary_preferences=['vegetarian'])
     assert result['source']=='backend/data/menu.json'
     assert result['dishes'] and all(d['vegetarian'] and d['available'] for d in result['dishes'])
-    assert all(d['vegan'] for d in recommend_dishes(3,['vegan'])['candidates'])
+    from backend.recommendations import candidates
+    matches=candidates(3,['vegan'])['candidates']
+    assert matches and all(d['vegan'] for d in matches)
+    form=recommend_dishes(3,['vegan'])
+    assert form['ui_request']=='recommendation_filters' and form['recommendation']['candidates']==[]
+
+def test_menu_rejects_mistyped_category_and_preference():
+    assert 'error' in get_menu(category='vegetarian')
+    assert 'error' in get_menu(dietary_preferences=['vegeterian'])
+    dishes=get_menu(category='main',dietary_preferences=['vegetarian'])['dishes']
+    assert dishes and all(d['category']=='main' and d['vegetarian'] for d in dishes)
 
 def test_server_money_and_session_isolation(store):
     store.change('alice','add','tiramisu',2)

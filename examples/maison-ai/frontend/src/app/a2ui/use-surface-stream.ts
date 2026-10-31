@@ -44,7 +44,7 @@ export function useSurfaceStream(processMessages:(ops:SurfaceOperation[])=>void,
   const ingest=(op:SurfaceOperation):void=>{
    const create=op.createSurface as {surfaceId:string}|undefined;
    const remove=op.deleteSurface as {surfaceId:string}|undefined;
-   if(remove){cache.current.delete(remove.surfaceId);order.current=order.current.filter(id=>id!==remove.surfaceId);queue.current.push(op);return;}
+   if(remove){cache.current.delete(remove.surfaceId);orphans.current.delete(remove.surfaceId);order.current=order.current.filter(id=>id!==remove.surfaceId);queue.current.push(op);return;}
    if(create){
     if(cache.current.has(create.surfaceId))return;
     cache.current.set(create.surfaceId,{create:op,components:new Map(),data:new Map()});
@@ -79,7 +79,7 @@ export function useSurfaceStream(processMessages:(ops:SurfaceOperation[])=>void,
   };
   for(const op of ops){
    const sid=surfaceOf(op);
-   if(sid&&!op.deleteSurface&&!cache.current.has(sid)){
+   if(sid&&!op.createSurface&&!op.deleteSurface&&!cache.current.has(sid)){
     // An update whose surface has not been announced yet is held, not dropped.
     const held=orphans.current.get(sid);
     if(held){if(held.length<ORPHAN_LIMIT)held.push(op);}

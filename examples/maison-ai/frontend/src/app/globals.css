@@ -51,8 +51,7 @@
 .menu-add{display:grid;place-items:center;flex-shrink:0;width:28px;height:28px;background:var(--pale);color:var(--blue);border-radius:50%;font-size:21px;transition:background .2s,color .2s}
 .menu-loading{color:var(--muted);padding:48px 0}
 .menu-progress{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);border:1px solid var(--line);border-radius:999px;padding:12px 22px;background:#fff;color:var(--muted);font-size:13px;box-shadow:0 4px 22px #20212410;z-index:15}
-.agent-content{max-width:720px;margin:auto}
-.agent-content.has-surfaces{display:grid;grid-template-columns:minmax(0,370px) minmax(0,1fr);gap:32px;max-width:none;align-items:start}
+.agent-content{width:100%;max-width:1280px;margin:auto}
 .agent-view .conversation{border:0;border-radius:0;background:transparent;min-width:0}
 .agent-view .conversation>.panel-heading{padding:8px 10px 18px;border-bottom:1px solid var(--line)}
 .agent-view .panel-heading h2{font-size:18px}
@@ -96,11 +95,8 @@
  .menu-item-heading>span{font-size:13px}
  .menu-description{font-size:12px;line-height:1.45}
  .menu-add{width:26px;height:26px}
- .agent-content.has-surfaces{display:flex;flex-direction:column;gap:22px}
- .agent-content.has-surfaces .conversation,.agent-results{width:100%}
  .agent-view .conversation>.panel-heading{padding:8px 0 16px}
  .agent-view .maison-chat{height:calc(100dvh - 170px)!important;min-height:300px}
- .agent-content.has-surfaces .maison-chat{height:46dvh!important;min-height:300px}
  .dish-dialog,.table-dialog{margin:auto auto 12px;max-height:calc(100dvh - 24px);border-radius:24px}
  .detail-photo{height:200px}
  .detail-body{padding:22px}
@@ -128,27 +124,20 @@ body{overflow-x:clip}
 .maison-chat [data-testid="copilot-input-overlay"]{padding:8px 0 max(4px,env(safe-area-inset-bottom))}
 .agent-view{position:fixed;inset:110px 32px 12px;max-width:none;margin:auto;min-height:0}
 .agent-view .agent-content{height:100%;min-height:0}
-.agent-view .agent-content.has-surfaces{width:calc(50% - 20px);margin:0 auto 0 0}
 .agent-view .conversation{height:100%;min-height:0}
 .agent-view .maison-chat{height:100%!important;min-height:0!important}
 .agent-results{height:100%;overflow-y:auto;overscroll-behavior:contain}
 @media(max-width:760px){
  .agent-view{inset:80px 0 0;padding:0 8px;max-width:none}
- .agent-view .agent-content.has-surfaces{height:100%;gap:12px}
- .agent-view .agent-content.has-surfaces .conversation{order:2;flex:1;min-height:0;height:auto}
- .agent-view .agent-content.has-surfaces .agent-results{order:1;flex:0 1 36%;max-height:36%;padding:12px 12px 0}
  .maison-chat [data-testid="copilot-chat-input"]{border-radius:26px}
  .maison-chat [data-testid="copilot-input-overlay"]{padding-bottom:max(6px,env(safe-area-inset-bottom))}
  .maison-chat [data-testid="copilot-scroll-content"]{padding-top:12px}
 }
 
 @media(min-width:761px){
- .agent-view .agent-content.has-surfaces .maison-chat{width:100%!important}
- .agent-view .agent-content.has-surfaces .inline-a2ui{position:fixed;top:110px;right:32px;bottom:12px;width:calc(50% - 20px);margin:0;padding:32px 10px 24px;overflow:auto;overscroll-behavior:contain;background:var(--bg);z-index:10;animation:a2ui-panel-enter .48s cubic-bezier(.2,.75,.25,1) both}
  .inline-a2ui .surface-shell{animation:a2ui-card-enter .42s cubic-bezier(.2,.75,.25,1) both}
  .inline-a2ui .surface-shell:nth-child(2){animation-delay:70ms}
  .inline-a2ui .surface-shell:nth-child(3){animation-delay:130ms}
- .inline-a2ui-close{position:fixed;top:116px;right:42px;z-index:12;width:30px;height:30px;border:1px solid var(--line);border-radius:50%;background:var(--bg);color:var(--muted);font-size:20px;line-height:1}
  .inline-a2ui-mini{display:block;margin:12px 0 12px auto;max-width:180px;border:1px solid var(--line);border-radius:14px;padding:10px 14px;background:#e8f0fe;color:#185abc;font-size:12px;animation:a2ui-mini-enter .3s ease-out both}
 }
 @media(max-width:760px){.inline-a2ui-close{display:none}}
@@ -168,6 +157,7 @@ html::-webkit-scrollbar,body::-webkit-scrollbar,.maison-chat::-webkit-scrollbar,
 /* Anchor floating controls to the chat viewport, outside its scrolling content. */
 .maison-chat>div:has([data-testid="copilot-scroll-content"]){position:static!important}
 .maison-chat [data-testid="copilot-scroll-content"]>div{width:100%;max-width:none;min-width:0}
+.maison-chat [data-testid="copilot-input-overlay"] div:has(>[data-testid="copilot-chat-input"]){max-width:none}
 .inline-a2ui{--muted:#737880;--ink:#202124;--line:#e0e3e7;--blue:#4285f4;width:100%;min-width:0;color:var(--ink)}
 .inline-a2ui .dish-grid{align-items:stretch}
 .inline-a2ui .dish-card{display:flex;flex-direction:column}
@@ -190,25 +180,11 @@ html::-webkit-scrollbar,body::-webkit-scrollbar,.maison-chat::-webkit-scrollbar,
 @media(max-width:760px){.chat-welcome{top:6%;gap:20px;padding:12px 8px}.chat-welcome-copy h1{font-size:27px}.chat-welcome-copy>p:last-child{font-size:13px}.suggested-prompts{gap:8px}.suggested-prompt{font-size:12px;min-height:40px;gap:10px;padding-left:13px}}
 
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
-/* Desktop conversation and workspace are independent layout columns. */
-.agent-view .agent-content.has-surfaces{display:grid;grid-template-columns:minmax(300px,.85fr) minmax(0,1.4fr);width:100%;max-width:none;gap:28px;margin:0;align-items:stretch}
-.dining-workspace{display:flex;flex-direction:column;min-width:0;min-height:0;height:100%;border:1px solid var(--line);border-radius:28px;background:#fff;overflow:hidden;animation:a2ui-panel-enter .4s ease both}
-.dining-workspace-header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 24px;border-bottom:1px solid #f1f3f4;flex:none;font-size:14px;color:var(--ink)}
-.dining-workspace-header button{width:30px;height:30px;border:0;border-radius:50%;background:transparent;color:var(--muted);font-size:24px}
-.dining-workspace-header button:hover{background:#f1f3f4}
-.dining-workspace-body{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding:20px 24px 28px}
-.agent-view .agent-content.has-surfaces .dining-workspace .inline-a2ui{position:static;inset:auto;width:100%;margin:0;padding:0;overflow:visible;background:transparent;animation:none}
-.dining-workspace .workflow-form{border:0;padding:0;border-radius:0}
-.dining-workspace .surface-shell{margin-bottom:16px}
-.inline-a2ui-mini{display:flex;align-items:center;justify-content:space-between;gap:24px;width:min(100%,300px);max-width:300px;margin:12px 0;padding:16px 18px;border:1px solid #d3e3fd;border-radius:18px;background:#e8f0fe;color:#185abc;font-size:13px;text-align:left;animation:a2ui-mini-enter .3s ease both}
-.inline-a2ui-mini span{font-size:11px;white-space:nowrap}
 .inline-loading{max-width:260px;margin:12px 0}
-@media(max-width:999px){.agent-view .agent-content{width:100%;max-width:720px}.agent-view .inline-a2ui{position:static!important;inset:auto!important;width:100%!important;padding:0!important;margin:16px 0!important;overflow:visible!important;background:transparent!important}}
-.card-open-arrow{display:grid;place-items:center;width:30px;height:30px;flex:none;border-radius:50%;background:#fff;color:#185abc;box-shadow:0 1px 3px #185abc16}
-.dining-workspace .surface-shell:has(.workflow-form){animation:workspace-change .32s ease both}
-.dining-workspace .surface-shell:has(.dish-grid){animation:workspace-change .38s ease both}
-.dining-workspace .dish-grid .dish-card{animation:workspace-change .35s ease both}
-.dining-workspace .dish-grid .dish-card:nth-child(2){animation-delay:60ms}
-.dining-workspace .dish-grid .dish-card:nth-child(3){animation-delay:120ms}
+@media(max-width:999px){.agent-view .agent-content{width:100%;max-width:none}.agent-view .inline-a2ui{position:static!important;inset:auto!important;width:100%!important;padding:0!important;margin:16px 0!important;overflow:visible!important;background:transparent!important}}
+.inspector-toggle{position:absolute;left:24px;top:28px;width:36px;height:36px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--muted);font:13px ui-monospace,monospace}
+.chat-welcome{bottom:116px;overflow-y:auto;pointer-events:auto}
+.chat-welcome-copy,.suggested-prompts{flex-shrink:0}
+@media(max-height:650px){.chat-welcome{top:0;justify-content:flex-start;gap:12px;padding:8px 12px}.chat-welcome-eyebrow{margin-bottom:6px}.chat-welcome-copy h1{font-size:26px}.chat-welcome-copy>p:last-child{margin-top:8px;font-size:13px}}
+@media(max-width:760px){.inspector-toggle{left:16px;top:22px;width:30px;height:32px}}
 @keyframes workspace-change{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-@media(prefers-reduced-motion:reduce){.dining-workspace *{animation:none!important}}

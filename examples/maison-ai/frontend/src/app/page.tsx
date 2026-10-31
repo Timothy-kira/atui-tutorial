@@ -8,7 +8,7 @@ import {catalog} from './a2ui/catalog';
 import {DiningContext,SurfaceContext,SurfaceLoadContext,type Dish,type Selection,type UIAction} from './a2ui/context';
 import {money} from './a2ui/renderers';
 import {connectPresentation} from './presentation-bridge';
-import {InlineSurfaceContext,InlineToolResponse,SurfaceCards} from './a2ui/inline-surfaces';
+import {InlineSurfaceContext,InlineToolResponse} from './a2ui/inline-surfaces';
 import {useSurfaceStream,type StreamUpdate,type SurfaceOperation} from './a2ui/use-surface-stream';
 
 type CartItem={id:string;dish_id:string;name:string;quantity:number;options:Record<string,string>;line_total_cents:number};
@@ -35,10 +35,7 @@ function Restaurant({thread}:{thread:string}){
  const {agent}=useAgent({agentId:'maison',throttleMs:0});const actionPending=useRef(false);
  const {processMessages}=useA2UI();
  const [toolSurfaces,setToolSurfaces]=useState<Record<string,string[]>>({});
- const [surfacesCollapsed,setSurfacesCollapsed]=useState(false);
- const [activeTool,setActiveTool]=useState('');
- const [desktop,setDesktop]=useState(false);
- useEffect(()=>{const media=window.matchMedia('(min-width: 1000px)');const update=()=>setDesktop(media.matches);update();media.addEventListener('change',update);return()=>media.removeEventListener('change',update);},[]);
+ const currentTurnSurface=useRef('');
  const surfaceOwners=useRef(new Map<string,string>());
  function scopeOperations(ops:SurfaceOperation[],owner:string,source?:string){
   return ops.map(op=>{
@@ -46,9 +43,10 @@ function Restaurant({thread}:{thread:string}){
    if(!key)return op;
    const value=op[key] as Record<string,unknown>,base=String(value.surfaceId);
    const sid=source||(surfaceOwners.current.has(base)||base.startsWith('generated-')?base:base+'--'+owner);
+   currentTurnSurface.current=sid;
    if(!surfaceOwners.current.has(sid)){
     surfaceOwners.current.set(sid,owner);
-    setActiveTool(owner);setSurfacesCollapsed(false);
+    currentTurnSurface.current=sid;
     setToolSurfaces(current=>({...current,[owner]:[...new Set([...(current[owner]||[]),sid])]}));
    }
    return {...op,[key]:{...value,surfaceId:sid}};
@@ -63,6 +61,31 @@ function Restaurant({thread}:{thread:string}){
  const [busy,setBusy]=useState(false);const [activity,setActivity]=useState('Working…');const [error,setError]=useState('');const [inspector,setInspector]=useState(false);const [raw,setRaw]=useState(false);
  const [view,setView]=useState<'menu'|'agent'>('menu');const [cartOpen,setCartOpen]=useState(false);const cartDialog=useRef<HTMLDialogElement>(null);
  useEffect(()=>{window.scrollTo({top:0,behavior:'instant'});},[view]);
+ useEffect(()=>{
+   if(view!=='agent')return;
+   let nextFrame=0;let followFrame=0;let observer:MutationObserver|undefined;
+   const frame=requestAnimationFrame(()=>{nextFrame=requestAnimationFrame(()=>{
+     const content=document.querySelector<HTMLElement>('#dining-chat [data-testid="copilot-scroll-content"]');
+     if(!content)return;
+     let lastAligned:HTMLElement|undefined;
+     const align=()=>{
+     const inlineSurface=currentTurnSurface.current?content.querySelector<HTMLElement>(`[data-surface-id="${CSS.escape(currentTurnSurface.current)}"]`):null;
+     const latest=inlineSurface?.closest<HTMLElement>('[data-testid="copilot-assistant-message"]')||(busy?Array.from(content.querySelectorAll<HTMLElement>('[data-testid="copilot-user-message"]')).at(-1):Array.from(content.querySelectorAll<HTMLElement>('[data-testid="copilot-assistant-message"]')).reverse().find(node=>node.querySelector('p')));
+     if(!latest)return;
+     if(latest===lastAligned)return;
+     let viewport=content.parentElement;
+     while(viewport&&viewport.id!=='dining-chat'&&!/(auto|scroll)/.test(getComputedStyle(viewport).overflowY))viewport=viewport.parentElement;
+     if(!viewport||viewport.id==='dining-chat')return;
+     const top=viewport.scrollTop+latest.getBoundingClientRect().top-viewport.getBoundingClientRect().top-12;
+     viewport.scrollTo({top:Math.max(0,top),behavior:'instant'});
+     lastAligned=latest;
+     };
+     observer=new MutationObserver(()=>{cancelAnimationFrame(followFrame);followFrame=requestAnimationFrame(align);});
+     observer.observe(content,{childList:true,subtree:true,characterData:true});
+     align();
+   });});
+   return()=>{cancelAnimationFrame(frame);cancelAnimationFrame(nextFrame);cancelAnimationFrame(followFrame);observer?.disconnect();};
+ },[busy,view,agent.messages.length]);
  useEffect(()=>{if(cartOpen)cartDialog.current?.showModal();else cartDialog.current?.close();},[cartOpen]);
  const [selections,setSelections]=useState<Record<string,Selection>>({});const selectionRef=useRef(selections);const seen=useRef(new Set<string>());
  const {surfaces,operations,loadingSurfaces,failedSurfaces,apply,stream,rollback,flush}=useSurfaceStream(processMessages,selectionRef,()=>setPendingSurface(null));
@@ -77,18 +100,18 @@ function Restaurant({thread}:{thread:string}){
   selectionRef.current=next;setSelections(next);
  }
  const refreshCart=()=>fetch('/api/demo/cart/'+thread,{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('Could not load cart');return r.json();}).then(acceptCart);
- useEffect(()=>{Promise.all([fetch('/api/demo/menu').then(r=>r.json()).then(d=>setMenu(d.dishes)),fetch('/api/demo/health').then(r=>r.json()).then(d=>setProvider(d.provider)),refreshCart()]).catch(()=>setError('The dining assistant is offline. Start the Python backend.'));},[thread]);
+ useEffect(()=>{Promise.all([fetch('/api/demo/menu').then(r=>{if(!r.ok)throw Error('Menu unavailable');return r.json();}).then(d=>setMenu(d.dishes)),fetch('/api/demo/health').then(r=>{if(!r.ok)throw Error('Agent unavailable');return r.json();}).then(d=>setProvider(d.provider)),refreshCart()]).catch(()=>setError('The dining assistant is offline. Start the Python backend.'));},[thread]);
  useEffect(()=>{
    const sub=agent.subscribe({onEvent:({event})=>{
      const e=event as unknown as WireEvent;
      // Keep actual protocol events, without displaying model reasoning content.
      if(!e.type.startsWith('REASONING'))setEvents(old=>[...old.slice(-199),e]);
-     if(e.type==='RUN_STARTED'){setBusy(true);setActivity('Working on your request…');setError('');setRetryable(false);}
+     if(e.type==='RUN_STARTED'){currentTurnSurface.current='';setBusy(true);setActivity('Working on your request…');setError('');setRetryable(false);}
      if(e.type==='TOOL_CALL_START'){const labels:Record<string,string>={get_cart:'Checking your table…',get_menu:'Reading the menu…',get_dish_details:'Checking dish details…',update_cart:'Updating your table…',recommend_dishes:'Finding dishes for you…',calculate_total_calories:'Calculating recipe energy…',show_reservation:'Preparing your reservation…',check_reservation:'Checking available tables…',reserve_table:'Confirming your table…',generate_a2ui:'Preparing your dining options…',ask_user:'Waiting for your choice…'};setActivity(labels[String(e.toolCallName)]||'Preparing your response…');}
      if(e.type==='TOOL_CALL_RESULT')setActivity('Preparing your response…');
      if(e.type==='TOOL_CALL_START'&&['recommend_dishes','generate_a2ui','quote_order','calculate_total_calories','show_reservation','check_reservation'].includes(String(e.toolCallName)))setPendingSurface(['recommend_dishes','generate_a2ui'].includes(String(e.toolCallName))?'cards':'card');
      if(e.type==='TEXT_MESSAGE_CONTENT')setActivity('Writing your response…');
-     if(e.type==='RUN_ERROR'){rollback();flush();setPendingSurface(null);setError(String(e.message||'Something went wrong'));setBusy(false);}
+     if(e.type==='RUN_ERROR'){rollback();flush();setPendingSurface(null);const info=e.error as {message?:string}|undefined;setError(String(info?.message||e.message||'The agent could not finish this request. Your cart is saved.'));setBusy(false);}
      if(e.type==='RUN_FINISHED'){if(rollback()){setError('The interface could not finish loading. Your previous choices are saved.');setRetryable(true);}flush();setPendingSurface(null);setBusy(false);void refreshCart().catch(()=>{});}
      // Read the cart from SQLite; an older ADK snapshot must not replace it.
      if(e.type==='CUSTOM'&&e.name==='A2UI_STREAM'){
@@ -98,7 +121,8 @@ function Restaurant({thread}:{thread:string}){
      if(e.type==='TOOL_CALL_RESULT'){
        const id=String(e.toolCallId);if(seen.current.has(id))return;
        try{const value=typeof e.content==='string'?JSON.parse(e.content):e.content;
-         if(value?.a2ui_operations){seen.current.add(id);apply(scopeOperations(value.a2ui_operations,id));}
+         if(value?.error){setPendingSurface(null);setError(typeof value.error==='string'?value.error:'The interface could not be generated. Your cart is saved.');}
+         if(value?.a2ui_operations){seen.current.add(id);apply(scopeOperations(value.a2ui_operations,id));setError('');setRetryable(false);}
          if(value?.cart)acceptCart(value.cart);
          if(value?.recommendation)acceptRecommendation(value.recommendation);
          if(value?.error){setError(String(value.error));setPendingSurface(null);}
@@ -107,64 +131,45 @@ function Restaurant({thread}:{thread:string}){
    }});return ()=>sub.unsubscribe();
  },[agent,processMessages,thread,apply,stream,rollback,flush]);
  async function sendAction(action:UIAction):Promise<boolean>{
-   if(actionPending.current)return false;
+   if(actionPending.current||agent.isRunning)return false;
    let context={...action.context};
    if(action.name==='add_to_cart'){
-     const id=String(context.dish_id);const dish=menu.find(d=>d.id===id);const choice=selectionRef.current[id];
+     const id=String(context.dish_id),dish=menu.find(d=>d.id===id),choice=selectionRef.current[id];
      const defaults=Object.fromEntries(Object.entries(dish?.options||{}).filter(([name])=>name!=='doneness').map(([name,values])=>[name,values[0]]));
      context={...context,quantity:choice?.quantity??context.quantity??1,options:{...defaults,...(context.options as Record<string,string>||{}),...choice?.options}};
    }
-   actionPending.current=true;setBusy(true);setActivity('Updating your table…');setError('');setRetryable(false);
-   let paintQueued=false;
-   if(['recommend_dishes','checkout','calculate_calories','open_reservation','check_reservation'].includes(action.name))setPendingSurface(action.name==='recommend_dishes'?'cards':'card');
+   actionPending.current=true;setBusy(true);setActivity('Updating your pickup order…');setError('');setRetryable(false);
+   let succeeded=false;let actionToolCallId='';let rendered=false;
    try{
-     const response=await fetch('/api/demo/actions/'+thread,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:action.name,context})});
-     const value=await response.json();
-     if(!response.ok)throw Error(typeof value.detail==='string'?value.detail:'Could not update your table. Please try again.');
-     acceptCart(value.cart);
-     if(value.recommendation)acceptRecommendation(value.recommendation);
-     if(typeof value.assistant_message==='string')agent.addMessage({id:crypto.randomUUID(),role:'assistant',content:value.assistant_message});
-     if(value.a2ui_operations){
-       const owner=action.surfaceId?surfaceOwners.current.get(action.surfaceId)||crypto.randomUUID():crypto.randomUUID();
-       if(!action.surfaceId){
-         agent.addMessage({id:crypto.randomUUID(),role:'assistant',toolCalls:[{id:owner,type:'function',function:{name:'ui_action',arguments:JSON.stringify({name:action.name})}}]});
-         agent.addMessage({id:crypto.randomUUID(),role:'tool',toolCallId:owner,content:JSON.stringify({ok:true})});
-       }
-       apply(scopeOperations(value.a2ui_operations,owner,action.surfaceId));paintQueued=true;
-       if(action.name==='recommend_dishes'){
-         setActiveTool(owner);setSurfacesCollapsed(false);
-         requestAnimationFrame(()=>document.querySelector('.dining-workspace-body')?.scrollTo({top:0,behavior:'smooth'}));
-       }
-     }
-     if(['checkout','confirm_order','calculate_calories','recommend_dishes','open_reservation','check_reservation','confirm_reservation'].includes(action.name)){setView('agent');setCartOpen(false);}
-     return true;
-   }catch(cause){setError(cause instanceof Error?cause.message:'Could not update your table. Please try again.');return false;}
-   finally{actionPending.current=false;setBusy(false);if(paintQueued)flush();else setPendingSurface(null);}
+     // Button commands travel over the SAME AG-UI stream as chat. Only the
+     // backend ADK tool emits TOOL_CALL_* results; no synthetic tool messages.
+     await agent.runAgent({forwardedProps:{a2uiAction:{name:action.name,context}}},{onEvent:({event})=>{
+       const e=event as unknown as WireEvent;
+       if(e.type==='TOOL_CALL_START'&&e.toolCallName==='handle_ui_action')actionToolCallId=String(e.toolCallId);
+       if(e.type==='TOOL_CALL_RESULT')try{const value=typeof e.content==='string'?JSON.parse(e.content):e.content;
+         if(String(e.toolCallId)===actionToolCallId)succeeded=!!(value&&!value.error&&(value.cart||value.recommendation||value.quote||value.order||value.availability||value.reservation||value.date||value.a2ui_operations));
+         if(value?.a2ui_operations)rendered=true;
+       }catch{/* Non-JSON results are retained in Inspector. */}
+       if(e.type==='RUN_ERROR')succeeded=false;
+     }});
+     if(rendered&&!succeeded){setView('agent');setCartOpen(false);}
+     if(succeeded&&['checkout','confirm_order','calculate_calories','recommend_dishes','open_reservation','check_reservation','confirm_reservation'].includes(action.name)){setView('agent');setCartOpen(false);}
+     return succeeded;
+   }catch(cause){rollback();setError(cause instanceof Error?cause.message:'Could not update your pickup order. Please try again.');return false;}
+   finally{actionPending.current=false;setBusy(false);flush();setPendingSurface(null);}
  }
- // Remove legacy UI-operation turns created by the old chat-based action handler.
- useEffect(()=>{
-   let internalTurn=false;
-   const messages=agent.messages.filter(message=>{
-     if(message.role==='user'){
-       internalTurn=false;
-       if(typeof message.content==='string')try{internalTurn=!!JSON.parse(message.content)?.a2uiAction;}catch{}
-     }
-     return !internalTurn;
-   });
-   if(messages.length!==agent.messages.length)agent.setMessages(messages);
- },[agent]);
  useEffect(()=>{const listener=(e:Event)=>{void sendAction((e as CustomEvent<UIAction>).detail);};window.addEventListener('maison-action',listener);return()=>window.removeEventListener('maison-action',listener);},[menu,agent,processMessages,thread]);
  function change(id:string,patch:Selection,surfaceId:string){const existing=selectionRef.current[id]||{};const value={...existing,...patch,options:{...existing.options,...patch.options}};selectionRef.current={...selectionRef.current,[id]:value};setSelections(selectionRef.current);if(surfaceId)processMessages([{version:'v0.9',updateDataModel:{surfaceId,path:'/selections/'+id,value}}]);}
  function askSuggestedPrompt(prompt:string){
-   if(busy||agent.isRunning)return;
+   if(busy||actionPending.current||agent.isRunning)return;
    setError('');
    agent.addMessage({id:crypto.randomUUID(),role:'user',content:prompt});
    void agent.runAgent().catch(()=>{rollback();flush();setBusy(false);setError('Connection interrupted. Your cart is saved. Please send your message again.');});
  }
  const toolEvents=events.filter(e=>e.type==='TOOL_CALL_START');
  function retryResponse(){const last=[...agent.messages].reverse().find(message=>message.role==='user'&&typeof message.content==='string');if(last&&typeof last.content==='string')askSuggestedPrompt(last.content);}
- return <DiningContext.Provider value={{menu,selections,change:change,send:sendAction,busy}}><InlineSurfaceContext.Provider value={{byTool:toolSurfaces,surfaces,loading:loadingSurfaces,failed:failedSurfaces,retry:retryResponse,busy,collapsed:surfacesCollapsed,setCollapsed:setSurfacesCollapsed,desktop,openTool:(id:string)=>{setActiveTool(id);setSurfacesCollapsed(false);}}}>
-   <header className="view-navigation"><div className="view-tabs" role="tablist" aria-label="Dining view" onKeyDown={e=>{if(['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){e.preventDefault();const next=e.key==='Home'?'menu':e.key==='End'?'agent':view==='menu'?'agent':'menu';setView(next);document.getElementById(next+'-tab')?.focus();}}}>
+ return <DiningContext.Provider value={{menu,selections,change:change,send:sendAction,busy}}><InlineSurfaceContext.Provider value={{byTool:toolSurfaces,surfaces,loading:loadingSurfaces,failed:failedSurfaces,retry:retryResponse,busy}}>
+   <header className="view-navigation"><button className="inspector-toggle" aria-label="Developer Inspector" title="View actual ADK, AG-UI and A2UI events" onClick={()=>setInspector(true)}>{'{}'}</button><div className="view-tabs" role="tablist" aria-label="Dining view" onKeyDown={e=>{if(['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){e.preventDefault();const next=e.key==='Home'?'menu':e.key==='End'?'agent':view==='menu'?'agent':'menu';setView(next);document.getElementById(next+'-tab')?.focus();}}}>
      <span className="view-tab-indicator" style={{transform:`translateX(${view==='agent'?'100%':'0'})`}} aria-hidden="true"/>
      <button id="menu-tab" role="tab" aria-selected={view==='menu'} aria-controls="menu-view" tabIndex={view==='menu'?0:-1} onClick={()=>setView('menu')}>Menu</button>
      <button id="agent-tab" role="tab" aria-selected={view==='agent'} aria-controls="agent-view" tabIndex={view==='agent'?0:-1} onClick={()=>setView('agent')}>Agent</button>
@@ -180,11 +185,10 @@ function Restaurant({thread}:{thread:string}){
        <p className="demo-note">A fictional restaurant for DevFest. All orders are demo orders.</p>
      </section>
      <section id="agent-view" role="tabpanel" aria-labelledby="agent-tab" hidden={view!=='agent'} className="agent-view">
-       <div className={`agent-content${desktop&&activeTool&&!surfacesCollapsed?' has-surfaces':''}`}>
+       <div className="agent-content">
          <section id="dining-chat" className="conversation" aria-label="Dining assistant">
-           <div className="chat-stage">{agent.messages.length===0&&<section className="chat-welcome" aria-labelledby="chat-welcome-title"><div className="chat-welcome-copy"><p className="chat-welcome-eyebrow">MAISON DINING ASSISTANT</p><h1 id="chat-welcome-title">Good evening. What sounds good?</h1><p>I can recommend dishes, check ingredients and allergens, or help you build a meal for your table.</p></div><div className="suggested-prompts" aria-label="Suggested questions">{suggestedPrompts.map(prompt=><button className="suggested-prompt" key={prompt} disabled={busy} onClick={()=>askSuggestedPrompt(prompt)}><span>{prompt}</span><kbd aria-hidden="true">↵</kbd></button>)}</div></section>}{busy&&view==='agent'&&<div className="agent-activity" role="status"><span className="activity-spinner" aria-hidden="true"/>{activity}</div>}<CopilotChat agentId="maison" threadId={thread} autoScroll="none" throttleMs={0} welcomeScreen={false} className="maison-chat" labels={{chatInputPlaceholder:'What sounds good tonight?'}} onError={()=>{setBusy(false);setError('Connection interrupted. Your cart is saved. Please send your message again.');}}/></div>
+           <div className="chat-stage">{agent.messages.length===0&&<section className="chat-welcome" aria-labelledby="chat-welcome-title"><div className="chat-welcome-copy"><p className="chat-welcome-eyebrow">MAISON DINING ASSISTANT</p><h1 id="chat-welcome-title">Good evening. What sounds good?</h1><p>I can recommend dishes, check ingredients and allergens, or help you build a meal for your table.</p></div><div className="suggested-prompts" aria-label="Suggested questions">{suggestedPrompts.map(prompt=><button className="suggested-prompt" key={prompt} disabled={busy} onClick={()=>askSuggestedPrompt(prompt)}><span>{prompt}</span><kbd aria-hidden="true">↵</kbd></button>)}</div></section>}{busy&&view==='agent'&&<div className="agent-activity" role="status"><span className="activity-spinner" aria-hidden="true"/>{activity}</div>}<CopilotChat agentId="maison" threadId={thread} autoScroll="none" throttleMs={0} welcomeScreen={false} className="maison-chat" labels={{chatInputPlaceholder:'Ask Maison…'}} onError={()=>{setBusy(false);setError('Connection interrupted. Your cart is saved. Please send your message again.');}}/></div>
          </section>
-         {desktop&&activeTool&&!surfacesCollapsed&&<aside className="dining-workspace" aria-label="Dining cards"><header className="dining-workspace-header"><span>Dining cards</span><button aria-label="Collapse dining cards" onClick={()=>setSurfacesCollapsed(true)}>×</button></header><div className="dining-workspace-body"><SurfaceCards ids={(toolSurfaces[activeTool]||[]).filter(id=>surfaces.includes(id))}/></div></aside>}
        </div>
      </section>
    </main>

@@ -47,14 +47,13 @@ def cart_view(cart):
         nodes[0]['children'].insert(1,'empty')
     return surface('cart-view',nodes,cart)
 
-def mock_menu(dishes,sid='mock-menu',doneness=None):
+def menu_cards(dishes,sid='menu',doneness=None):
     nodes=[dict(id='root',component='Column',children=['heading','grid']),dict(id='heading',component='Text',text='A few things you might love.'),dict(id='grid',component='Row',children=[])]
     for d in dishes:
-        key=d['id'];children=[key+'-photo',key+'-price',key+'-tags',key+'-description']
+        key=d['id'];children=[key+'-photo',key+'-price',key+'-tags']
         nodes.extend([dict(id=key+'-photo',component='DishImage',dishId=key,src=d['image'],alt=d['name']),
           dict(id=key+'-price',component='PriceBadge',dishId=key),
-          dict(id=key+'-tags',component='DietaryBadge',vegetarian=d['vegetarian'],vegan=d['vegan']),
-          dict(id=key+'-description',component='Text',text=d['description'])])
+          dict(id=key+'-tags',component='DietaryBadge',vegetarian=d['vegetarian'],vegan=d['vegan'])])
         for option,choices in d['options'].items():
             id=key+'-'+option;children.append(id)
             nodes.append(dict(id=id,component='DishOptionSelector',dishId=key,option=option,choices=choices,value=doneness if option=='doneness' and doneness else choices[0]))
@@ -64,6 +63,24 @@ def mock_menu(dishes,sid='mock-menu',doneness=None):
           dict(id=key+'-body',component='Column',children=children),dict(id=key,component='Card',title=d['name'],child=key+'-body')])
         nodes[2]['children'].append(key)
     return surface(sid,nodes)
+
+
+def mock_menu(dishes,sid='mock-menu',doneness=None):
+    """Compatibility fixture; the renderer itself is shared with live tools."""
+    return menu_cards(dishes,sid,doneness)
+
+
+def dish_details(dish):
+    """A detail surface is distinct from the compact recommendation cards."""
+    return surface('dish-details-'+dish['id'],[
+        dict(id='root',component='Card',title=dish['name'],child='body'),
+        dict(id='body',component='Column',children=['photo','price','recipe','nutrition','allergens']),
+        dict(id='photo',component='DishImage',dishId=dish['id']),
+        dict(id='price',component='PriceBadge',dishId=dish['id']),
+        dict(id='recipe',component='Text',text=dish['preparation']),
+        dict(id='nutrition',component='Text',text=f"Approximately {dish['calories_kcal']} kcal per serving."),
+        dict(id='allergens',component='Text',text='Declared allergens: '+(', '.join(dish['allergens']) or 'none listed')+'. '+dish['allergen_note']),
+    ],dish)
 
 def calorie_summary(cart,party_size=1):
     nodes=[dict(id='root',component='Card',title='Calories at your table',subtitle='Recipe estimates based on the selected portions.',child='body'),

@@ -55,6 +55,11 @@ def worker(kind):
     write(folder/'status.json',status)
     if kind=='install':commands=[(ROOT,['uv','sync']),(ROOT/'frontend',[pnpm(),'install','--no-frozen-lockfile'])]
     elif kind=='live':commands=[(ROOT/'frontend',['node','scripts/export-catalog.mjs']),(ROOT,['uv','run','python','scripts/live_smoke.py'])]
+    elif kind=='provider':commands=[(ROOT,['uv','run','python','scripts/provider_probe.py'])]
+    elif kind=='dot-diagnostics':commands=[(ROOT,['uv','run','python','scripts/dot_diagnostics.py'])]
+    elif kind=='behavior':commands=[(ROOT,['uv','run','python','scripts/agent_behavior.py'])]
+    elif kind=='menu-ui':commands=[(ROOT,['uv','run','python','scripts/agent_behavior.py','--case','requested_menu_ui'])]
+    elif kind=='checkout':commands=[(ROOT,['uv','run','python','scripts/checkout_regression.py'])]
     elif kind=='e2e':commands=[(ROOT/'frontend',[pnpm(),'test:e2e'])]
     elif kind=='build':commands=[(ROOT/'frontend',[pnpm(),'build'])]
     elif kind=='assets':commands=[(ROOT,['python','scripts/refine_photos.py'])]
@@ -62,6 +67,7 @@ def worker(kind):
     with (folder/'output.log').open('a',encoding='utf-8',buffering=1) as log:
         for cwd, argv in commands:
             status.update(phase=' '.join(argv),updated=time.time());write(folder/'status.json',status)
+            phase_offset=log.tell()
             log.write('\nPHASE '+status['phase']+'\n');log.flush()
             for attempt in range(2 if kind=='install' else 1):
                 proc=subprocess.Popen(command(argv),cwd=cwd,stdout=log,stderr=subprocess.STDOUT,creationflags=FLAGS)
@@ -72,7 +78,8 @@ def worker(kind):
                     else: proc.kill()
                     code=124
                 if code==0: break
-                recent=(folder/'output.log').read_text(encoding='utf-8',errors='replace')[-12000:]
+                with (folder/'output.log').open('rb') as phase_log:
+                    phase_log.seek(phase_offset);recent=phase_log.read().decode('utf-8',errors='replace')[-12000:]
                 transient=bool(re.search('ECONNRESET|ETIMEDOUT|EAI_AGAIN|TLS|timed out|connection reset|download failed',recent,re.I))
                 if kind=='install' and attempt==0 and transient:
                     event(folder,'recovery','One retry for transient dependency download failure');continue
@@ -82,7 +89,10 @@ def worker(kind):
         event(folder,'complete',kind);notify(kind+' completed')
 
 def monitor(kind):
-    folder=STATE/kind;last_size=0;last_change=time.time();reported=False;seen=set()
+    folder=STATE/kind
+    cursor=folder/'monitor-start.json'
+    last_size=json.loads(cursor.read_text()).get('offset',0) if cursor.exists() else 0
+    last_change=time.time();reported=False;seen=set()
     for _ in range(360):
         time.sleep(5)
         path=folder/'status.json'
@@ -105,11 +115,13 @@ def monitor(kind):
     event(folder,'monitor_timeout','30 minute limit');notify('Task monitor reached its timeout')
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('action',choices=['start','worker','monitor','status']);p.add_argument('kind',choices=['install','verify','live','e2e','build','assets'],default='install',nargs='?');a=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('action',choices=['start','worker','monitor','status']);p.add_argument('kind',choices=['install','verify','live','provider','dot-diagnostics','behavior','menu-ui','checkout','e2e','build','assets'],default='install',nargs='?');a=p.parse_args()
     folder=STATE/a.kind;folder.mkdir(parents=True,exist_ok=True)
     if a.action=='start':
         current=folder/'status.json'
         if current.exists() and json.loads(current.read_text()).get('status')=='running': raise SystemExit('Already running; use status.')
+        log_path=folder/'output.log'
+        write(folder/'monitor-start.json',{'offset':log_path.stat().st_size if log_path.exists() else 0,'started':time.time()})
         subprocess.Popen([sys.executable,__file__,'worker',a.kind],cwd=ROOT,creationflags=FLAGS,stdout=subprocess.DEVNULL,stderr=open(folder/'worker.log','a'))
         subprocess.Popen([sys.executable,__file__,'monitor',a.kind],cwd=ROOT,creationflags=FLAGS,stdout=subprocess.DEVNULL,stderr=open(folder/'monitor.log','a'))
         print('Started. Inspect with: python scripts/jobs.py status '+a.kind)

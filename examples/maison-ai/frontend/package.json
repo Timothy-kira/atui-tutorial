@@ -14,9 +14,9 @@
     "@copilotkit/a2ui-renderer": "1.78.0",
     "@ag-ui/client": "1.0.2",
     "@ag-ui/a2ui-middleware": "0.0.12",
-    "next": "16.4.0",
-    "react": "19.3.0",
-    "react-dom": "19.3.0",
+    "next": "16.4.3",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
     "zod": "3.25.76",
     "rxjs": "7.8.1"
   },

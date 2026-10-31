@@ -14,7 +14,7 @@
 .serving-info{display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--muted);line-height:1.5}
 .serving-info strong{font-size:14px;color:var(--ink);font-weight:550}
 .serving-info small{font-size:11px}
-.nutrition-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:16px;border-radius:20px;background:#f1f6ff;padding:22px}
+.nutrition-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr));gap:16px;border-radius:20px;background:#f1f6ff;padding:22px}
 .nutrition-summary>div{display:flex;flex-direction:column;gap:12px}
 .nutrition-summary span{font-size:12px;color:var(--muted)}
 .nutrition-summary strong{font-size:30px;font-weight:550;letter-spacing:-.035em;color:#185abc}
@@ -35,23 +35,37 @@
 @media(max-width:760px){.workflow-form{padding:18px;border-radius:20px}.workflow-fields{gap:12px}.workflow-fields label{font-size:11px}.dining-workflows{padding:0 12px}.dining-workflows button{font-size:11px;padding:8px 11px}}
 /* Conversation dishes use compact list rows rather than large tiles. */
 .inline-a2ui .dish-grid{display:flex;flex-direction:column;gap:12px!important}
-.inline-a2ui .dish-card{display:grid;grid-template-columns:88px minmax(0,1fr) 126px;column-gap:16px;row-gap:7px;padding:16px;border-radius:18px;align-items:start}
-.inline-a2ui .dish-card>h3{grid-column:2/-1;margin:0;font-size:16px;line-height:1.3;letter-spacing:-.015em}
-.inline-a2ui .dish-card>.surface-column{display:contents}
-.inline-a2ui .dish-card .dish-photo{grid-column:1;grid-row:1/8;width:88px;height:88px;aspect-ratio:1;border-radius:12px}
-.inline-a2ui .dish-card .price-badge{grid-column:2;font-size:15px}
-.inline-a2ui .dish-card .dietary-tags,.inline-a2ui .dish-card .serving-info,.inline-a2ui .dish-card .option-control,.inline-a2ui .dish-card .surface-copy,.inline-a2ui .dish-card .dish-facts{grid-column:2}
-.inline-a2ui .dish-card .dietary-tags:empty{display:none}
-.inline-a2ui .dish-card .serving-info{gap:3px;font-size:11px}
-.inline-a2ui .dish-card .serving-info strong{font-size:12px;font-weight:500}
-.inline-a2ui .dish-card .quantity-control{grid-column:3;grid-row:2;margin:0;justify-content:flex-end}
-.inline-a2ui .dish-card .quantity-control>span{display:none}
-.inline-a2ui .dish-card .quantity-control>div{gap:10px}
-.inline-a2ui .dish-card .primary-button{grid-column:3;grid-row:3/5;padding:9px 10px;font-size:12px;align-self:end}
+.inline-a2ui .dish-card:has(> .surface-column > .dish-photo){display:grid;grid-template-columns:88px minmax(0,1fr) 126px;column-gap:16px;row-gap:7px;padding:16px;border-radius:18px;align-items:start}
+.inline-a2ui .dish-card:has(> .surface-column > .dish-photo)>h3{grid-column:2/-1;margin:0;font-size:16px;line-height:1.3;letter-spacing:-.015em}
+.inline-a2ui .dish-card:has(> .surface-column > .dish-photo)>.surface-column{display:contents}
+.inline-a2ui .dish-card:has(> .surface-column > .dish-photo) .dish-photo{grid-column:1;grid-row:1/8;width:88px;height:88px;aspect-ratio:1;border-radius:12px}
+.inline-a2ui .dish-card:has(> .surface-column > .dish-photo) .price-badge{grid-column:2;font-size:15px}
+.inline-a2ui .dish-card:has(> .surface-column > .dish-photo) .dietary-tags,.inline-a2ui .dish-card:has(> .surface-column > .dish-photo) .serving-info,.inline-a2ui .dish-card:has(> .surface-column > .dish-photo) .option-control,.inline-a2ui .dish-card:has(> .surface-column > .dish-photo) .surface-copy,.inline-a2ui .dish-card:has(> .surface-column > .dish-photo) .dish-facts{grid-column:2}
+.inline-a2ui .dish-card:has(> .surface-column > .dish-photo) .dietary-tags:empty{display:none}
+.inline-a2ui .dish-card:has(> .surface-column > .dish-photo) .serving-info{gap:3px;font-size:11px}
+.inline-a2ui .dish-card:has(> .surface-column > .dish-photo) .serving-info strong{font-size:12px;font-weight:500}
+.inline-a2ui .dish-card:has(> .surface-column > .dish-photo) .quantity-control{grid-column:3;grid-row:2;margin:0;justify-content:flex-end}
+.inline-a2ui .dish-card:has(> .surface-column > .dish-photo) .quantity-control>span{display:none}
+.inline-a2ui .dish-card:has(> .surface-column > .dish-photo) .quantity-control>div{gap:10px}
+.inline-a2ui .dish-card:has(> .surface-column > .dish-photo) .primary-button{grid-column:3;grid-row:3/5;padding:9px 10px;font-size:12px;align-self:end}
 .inline-a2ui .workflow-form{padding:18px;border-radius:18px}
 .inline-a2ui .workflow-title h3{font-size:18px}
 @media(max-width:520px){
- .inline-a2ui .dish-card{grid-template-columns:64px minmax(0,1fr);gap:8px 12px;padding:12px}
- .inline-a2ui .dish-card .dish-photo{width:64px;height:64px}
- .inline-a2ui .dish-card .quantity-control,.inline-a2ui .dish-card .primary-button{grid-column:2;grid-row:auto;justify-content:flex-start;width:auto;justify-self:start}
+ .inline-a2ui .dish-card:has(> .surface-column > .dish-photo){grid-template-columns:64px minmax(0,1fr);gap:8px 12px;padding:12px}
+ .inline-a2ui .dish-card:has(> .surface-column > .dish-photo) .dish-photo{width:64px;height:64px}
+ .inline-a2ui .dish-card:has(> .surface-column > .dish-photo) .quantity-control,.inline-a2ui .dish-card:has(> .surface-column > .dish-photo) .primary-button{grid-column:2;grid-row:auto;justify-content:flex-start;width:auto;justify-self:start}
 }
+/* Compact rows respond to workspace width, not only browser width. */
+@container a2ui-response (max-width:440px){
+ .inline-a2ui .dish-card:has(> .surface-column > .dish-photo){grid-template-columns:64px minmax(0,1fr);gap:8px 12px;padding:14px}
+ .inline-a2ui .dish-card:has(> .surface-column > .dish-photo) .dish-photo{width:64px;height:64px}
+ .inline-a2ui .dish-card:has(> .surface-column > .dish-photo) .quantity-control,.inline-a2ui .dish-card:has(> .surface-column > .dish-photo) .primary-button{grid-column:2;grid-row:auto;justify-content:flex-start;width:auto;justify-self:start}
+}
+@container a2ui-response (max-width:340px){
+ .workflow-fields{grid-template-columns:minmax(0,1fr)}
+}
+.nutrition-summary{width:100%;min-width:0}
+.nutrition-summary>div{min-width:0}
+.surface-column{min-width:0}
+.surface-copy{overflow-wrap:anywhere}
+.order-total{min-width:0;gap:16px;flex-wrap:wrap}

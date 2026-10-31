@@ -1,4 +1,10 @@
-# Maison AI presentation mock
+# 教学项目本地入口
+
+`index.html` 现在跳转到 `launch.html`，引导启动 `../examples/maison-ai` 完整应用，不再加载本目录内的脚本化前端演示。实际应用位于 http://127.0.0.1:3008。
+
+本目录其他图片、JS 和 CSS 是历史录制素材。以下记录仅说明这些素材原来的用途，不代表 ADK、AG-UI 或 A2UI 的实现。原视频工程的录制素材没有改动。
+
+## 历史录制素材说明
 
 Open `index.html` directly, or play the parent `video/index.html` presentation.
 No development server, backend, model credentials or package installation is needed.

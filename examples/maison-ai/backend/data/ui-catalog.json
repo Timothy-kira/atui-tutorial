@@ -1,0 +1,1288 @@
+{
+  "catalogId": "copilotkit://maison-restaurant",
+  "components": {
+    "Skeleton": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "component": {
+          "const": "Skeleton"
+        },
+        "variant": {
+          "type": "string",
+          "enum": [
+            "line",
+            "body",
+            "card",
+            "cards"
+          ],
+          "default": "line"
+        },
+        "failed": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "component"
+      ],
+      "additionalProperties": false
+    },
+    "Row": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "component": {
+          "const": "Row"
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "gap": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "id",
+        "component",
+        "children"
+      ],
+      "additionalProperties": false
+    },
+    "Column": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "component": {
+          "const": "Column"
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "gap": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "id",
+        "component",
+        "children"
+      ],
+      "additionalProperties": false
+    },
+    "Text": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "component": {
+          "const": "Text"
+        },
+        "text": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "description": "A JSON Pointer path to a value in the data model."
+                }
+              },
+              "required": [
+                "path"
+              ],
+              "additionalProperties": false,
+              "description": "REF:common_types.json#/$defs/DataBinding|A JSON Pointer path to a value in the data model."
+            },
+            {
+              "type": "object",
+              "properties": {
+                "call": {
+                  "type": "string",
+                  "description": "The name of the function to call."
+                },
+                "args": {
+                  "type": "object",
+                  "additionalProperties": {},
+                  "description": "Arguments passed to the function."
+                },
+                "returnType": {
+                  "type": "string",
+                  "enum": [
+                    "string",
+                    "number",
+                    "boolean",
+                    "array",
+                    "object",
+                    "any",
+                    "void"
+                  ],
+                  "default": "boolean"
+                }
+              },
+              "required": [
+                "call",
+                "args"
+              ],
+              "additionalProperties": false,
+              "description": "REF:common_types.json#/$defs/FunctionCall|Invokes a named function on the client."
+            }
+          ],
+          "description": "REF:common_types.json#/$defs/DynamicString|Represents a string"
+        }
+      },
+      "required": [
+        "id",
+        "component",
+        "text"
+      ],
+      "additionalProperties": false
+    },
+    "Card": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "component": {
+          "const": "Card"
+        },
+        "title": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "description": "A JSON Pointer path to a value in the data model."
+                }
+              },
+              "required": [
+                "path"
+              ],
+              "additionalProperties": false,
+              "description": "REF:common_types.json#/$defs/DataBinding|A JSON Pointer path to a value in the data model."
+            },
+            {
+              "type": "object",
+              "properties": {
+                "call": {
+                  "type": "string",
+                  "description": "The name of the function to call."
+                },
+                "args": {
+                  "type": "object",
+                  "additionalProperties": {},
+                  "description": "Arguments passed to the function."
+                },
+                "returnType": {
+                  "type": "string",
+                  "enum": [
+                    "string",
+                    "number",
+                    "boolean",
+                    "array",
+                    "object",
+                    "any",
+                    "void"
+                  ],
+                  "default": "boolean"
+                }
+              },
+              "required": [
+                "call",
+                "args"
+              ],
+              "additionalProperties": false,
+              "description": "REF:common_types.json#/$defs/FunctionCall|Invokes a named function on the client."
+            }
+          ],
+          "description": "REF:common_types.json#/$defs/DynamicString|Represents a string"
+        },
+        "subtitle": {
+          "$ref": "#/properties/title",
+          "description": "REF:common_types.json#/$defs/DynamicString|Represents a string"
+        },
+        "child": {
+          "type": "string"
+        },
+        "footerChildren": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "component",
+        "title"
+      ],
+      "additionalProperties": false
+    },
+    "Notice": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "component": {
+          "const": "Notice"
+        },
+        "message": {
+          "type": "string"
+        },
+        "severity": {
+          "type": "string",
+          "enum": [
+            "info",
+            "warning",
+            "error"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "component",
+        "message",
+        "severity"
+      ],
+      "additionalProperties": false
+    },
+    "DataTable": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "component": {
+          "const": "DataTable"
+        },
+        "columns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "maxItems": 8
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": [
+                "string",
+                "number"
+              ]
+            }
+          },
+          "maxItems": 30
+        }
+      },
+      "required": [
+        "id",
+        "component",
+        "columns",
+        "rows"
+      ],
+      "additionalProperties": false
+    },
+    "Form": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "component": {
+          "const": "Form"
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "submitLabel": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "recommend_dishes",
+            "check_reservation",
+            "calculate_calories"
+          ]
+        },
+        "context": {
+          "type": "object",
+          "additionalProperties": {}
+        }
+      },
+      "required": [
+        "id",
+        "component",
+        "children",
+        "submitLabel",
+        "action"
+      ],
+      "additionalProperties": false
+    },
+    "Field": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "component": {
+          "const": "Field"
+        },
+        "name": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "text",
+            "number",
+            "date",
+            "time",
+            "select",
+            "multi"
+          ]
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "options": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "label",
+              "value"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        },
+        "required": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "component",
+        "name",
+        "label",
+        "type",
+        "value"
+      ],
+      "additionalProperties": false
+    },
+    "Button": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "component": {
+          "const": "Button"
+        },
+        "label": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "description": "A JSON Pointer path to a value in the data model."
+                }
+              },
+              "required": [
+                "path"
+              ],
+              "additionalProperties": false,
+              "description": "REF:common_types.json#/$defs/DataBinding|A JSON Pointer path to a value in the data model."
+            },
+            {
+              "type": "object",
+              "properties": {
+                "call": {
+                  "type": "string",
+                  "description": "The name of the function to call."
+                },
+                "args": {
+                  "type": "object",
+                  "additionalProperties": {},
+                  "description": "Arguments passed to the function."
+                },
+                "returnType": {
+                  "type": "string",
+                  "enum": [
+                    "string",
+                    "number",
+                    "boolean",
+                    "array",
+                    "object",
+                    "any",
+                    "void"
+                  ],
+                  "default": "boolean"
+                }
+              },
+              "required": [
+                "call",
+                "args"
+              ],
+              "additionalProperties": false,
+              "description": "REF:common_types.json#/$defs/FunctionCall|Invokes a named function on the client."
+            }
+          ],
+          "description": "REF:common_types.json#/$defs/DynamicString|Represents a string"
+        },
+        "action": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "enum": [
+                "add_to_cart",
+                "update_item",
+                "remove_item",
+                "checkout",
+                "confirm_order",
+                "calculate_calories",
+                "recommend_dishes",
+                "open_reservation",
+                "check_reservation",
+                "confirm_reservation"
+              ]
+            },
+            "context": {
+              "type": "object",
+              "additionalProperties": {}
+            }
+          },
+          "required": [
+            "name"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "id",
+        "component",
+        "label",
+        "action"
+      ],
+      "additionalProperties": false
+    },
+    "DishImage": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "component": {
+          "const": "DishImage"
+        },
+        "dishId": {
+          "type": "string"
+        },
+        "src": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "description": "A JSON Pointer path to a value in the data model."
+                }
+              },
+              "required": [
+                "path"
+              ],
+              "additionalProperties": false,
+              "description": "REF:common_types.json#/$defs/DataBinding|A JSON Pointer path to a value in the data model."
+            },
+            {
+              "type": "object",
+              "properties": {
+                "call": {
+                  "type": "string",
+                  "description": "The name of the function to call."
+                },
+                "args": {
+                  "type": "object",
+                  "additionalProperties": {},
+                  "description": "Arguments passed to the function."
+                },
+                "returnType": {
+                  "type": "string",
+                  "enum": [
+                    "string",
+                    "number",
+                    "boolean",
+                    "array",
+                    "object",
+                    "any",
+                    "void"
+                  ],
+                  "default": "boolean"
+                }
+              },
+              "required": [
+                "call",
+                "args"
+              ],
+              "additionalProperties": false,
+              "description": "REF:common_types.json#/$defs/FunctionCall|Invokes a named function on the client."
+            }
+          ],
+          "description": "REF:common_types.json#/$defs/DynamicString|Represents a string"
+        },
+        "alt": {
+          "$ref": "#/properties/src",
+          "description": "REF:common_types.json#/$defs/DynamicString|Represents a string"
+        }
+      },
+      "required": [
+        "id",
+        "component",
+        "dishId"
+      ],
+      "additionalProperties": false
+    },
+    "DishFacts": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "component": {
+          "const": "DishFacts"
+        },
+        "dishId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "component",
+        "dishId"
+      ],
+      "additionalProperties": false
+    },
+    "PriceBadge": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "component": {
+          "const": "PriceBadge"
+        },
+        "dishId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "component",
+        "dishId"
+      ],
+      "additionalProperties": false
+    },
+    "DietaryBadge": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "component": {
+          "const": "DietaryBadge"
+        },
+        "vegetarian": {
+          "type": "boolean"
+        },
+        "vegan": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "component"
+      ],
+      "additionalProperties": false
+    },
+    "DishOptionSelector": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "component": {
+          "const": "DishOptionSelector"
+        },
+        "dishId": {
+          "type": "string"
+        },
+        "option": {
+          "type": "string",
+          "enum": [
+            "doneness",
+            "side",
+            "milk"
+          ]
+        },
+        "choices": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "description": "A JSON Pointer path to a value in the data model."
+                }
+              },
+              "required": [
+                "path"
+              ],
+              "additionalProperties": false,
+              "description": "REF:common_types.json#/$defs/DataBinding|A JSON Pointer path to a value in the data model."
+            },
+            {
+              "type": "object",
+              "properties": {
+                "call": {
+                  "type": "string",
+                  "description": "The name of the function to call."
+                },
+                "args": {
+                  "type": "object",
+                  "additionalProperties": {},
+                  "description": "Arguments passed to the function."
+                },
+                "returnType": {
+                  "type": "string",
+                  "enum": [
+                    "string",
+                    "number",
+                    "boolean",
+                    "array",
+                    "object",
+                    "any",
+                    "void"
+                  ],
+                  "default": "boolean"
+                }
+              },
+              "required": [
+                "call",
+                "args"
+              ],
+              "additionalProperties": false,
+              "description": "REF:common_types.json#/$defs/FunctionCall|Invokes a named function on the client."
+            }
+          ],
+          "description": "REF:common_types.json#/$defs/DynamicString|Represents a string"
+        }
+      },
+      "required": [
+        "id",
+        "component",
+        "dishId",
+        "option",
+        "choices"
+      ],
+      "additionalProperties": false
+    },
+    "QuantitySelector": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "component": {
+          "const": "QuantitySelector"
+        },
+        "dishId": {
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "description": "A JSON Pointer path to a value in the data model."
+                }
+              },
+              "required": [
+                "path"
+              ],
+              "additionalProperties": false,
+              "description": "REF:common_types.json#/$defs/DataBinding|A JSON Pointer path to a value in the data model."
+            },
+            {
+              "type": "object",
+              "properties": {
+                "call": {
+                  "type": "string",
+                  "description": "The name of the function to call."
+                },
+                "args": {
+                  "type": "object",
+                  "additionalProperties": {},
+                  "description": "Arguments passed to the function."
+                },
+                "returnType": {
+                  "type": "string",
+                  "enum": [
+                    "string",
+                    "number",
+                    "boolean",
+                    "array",
+                    "object",
+                    "any",
+                    "void"
+                  ],
+                  "default": "boolean"
+                }
+              },
+              "required": [
+                "call",
+                "args"
+              ],
+              "additionalProperties": false,
+              "description": "REF:common_types.json#/$defs/FunctionCall|Invokes a named function on the client."
+            }
+          ],
+          "description": "REF:common_types.json#/$defs/DynamicNumber|Represents a value that can be either a literal number, a path to a number in the data model, or a function call returning a number."
+        }
+      },
+      "required": [
+        "id",
+        "component",
+        "dishId"
+      ],
+      "additionalProperties": false
+    },
+    "CartItemControls": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "component": {
+          "const": "CartItemControls"
+        },
+        "itemId": {
+          "type": "string"
+        },
+        "dishId": {
+          "type": "string"
+        },
+        "quantity": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20
+        },
+        "options": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "component",
+        "itemId",
+        "dishId",
+        "quantity",
+        "options"
+      ],
+      "additionalProperties": false
+    },
+    "CartTotal": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "component": {
+          "const": "CartTotal"
+        },
+        "totalCents": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "description": "A JSON Pointer path to a value in the data model."
+                }
+              },
+              "required": [
+                "path"
+              ],
+              "additionalProperties": false,
+              "description": "REF:common_types.json#/$defs/DataBinding|A JSON Pointer path to a value in the data model."
+            },
+            {
+              "type": "object",
+              "properties": {
+                "call": {
+                  "type": "string",
+                  "description": "The name of the function to call."
+                },
+                "args": {
+                  "type": "object",
+                  "additionalProperties": {},
+                  "description": "Arguments passed to the function."
+                },
+                "returnType": {
+                  "type": "string",
+                  "enum": [
+                    "string",
+                    "number",
+                    "boolean",
+                    "array",
+                    "object",
+                    "any",
+                    "void"
+                  ],
+                  "default": "boolean"
+                }
+              },
+              "required": [
+                "call",
+                "args"
+              ],
+              "additionalProperties": false,
+              "description": "REF:common_types.json#/$defs/FunctionCall|Invokes a named function on the client."
+            }
+          ],
+          "description": "REF:common_types.json#/$defs/DynamicNumber|Represents a value that can be either a literal number, a path to a number in the data model, or a function call returning a number."
+        }
+      },
+      "required": [
+        "id",
+        "component",
+        "totalCents"
+      ],
+      "additionalProperties": false
+    },
+    "OrderStatus": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "component": {
+          "const": "OrderStatus"
+        },
+        "orderId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "description": "A JSON Pointer path to a value in the data model."
+                }
+              },
+              "required": [
+                "path"
+              ],
+              "additionalProperties": false,
+              "description": "REF:common_types.json#/$defs/DataBinding|A JSON Pointer path to a value in the data model."
+            },
+            {
+              "type": "object",
+              "properties": {
+                "call": {
+                  "type": "string",
+                  "description": "The name of the function to call."
+                },
+                "args": {
+                  "type": "object",
+                  "additionalProperties": {},
+                  "description": "Arguments passed to the function."
+                },
+                "returnType": {
+                  "type": "string",
+                  "enum": [
+                    "string",
+                    "number",
+                    "boolean",
+                    "array",
+                    "object",
+                    "any",
+                    "void"
+                  ],
+                  "default": "boolean"
+                }
+              },
+              "required": [
+                "call",
+                "args"
+              ],
+              "additionalProperties": false,
+              "description": "REF:common_types.json#/$defs/FunctionCall|Invokes a named function on the client."
+            }
+          ],
+          "description": "REF:common_types.json#/$defs/DynamicString|Represents a string"
+        },
+        "status": {
+          "$ref": "#/properties/orderId"
+        },
+        "totalCents": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "$ref": "#/properties/orderId/anyOf/1"
+            },
+            {
+              "$ref": "#/properties/orderId/anyOf/2"
+            }
+          ],
+          "description": "REF:common_types.json#/$defs/DynamicNumber|Represents a value that can be either a literal number, a path to a number in the data model, or a function call returning a number."
+        }
+      },
+      "required": [
+        "id",
+        "component",
+        "orderId",
+        "status",
+        "totalCents"
+      ],
+      "additionalProperties": false
+    },
+    "NutritionTotal": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "component": {
+          "const": "NutritionTotal"
+        },
+        "totalKcal": {
+          "type": "number",
+          "minimum": 0
+        },
+        "partySize": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12
+        },
+        "showSplit": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "component",
+        "totalKcal",
+        "partySize",
+        "showSplit"
+      ],
+      "additionalProperties": false
+    },
+    "CalorieControls": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "component": {
+          "const": "CalorieControls"
+        },
+        "partySize": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12
+        }
+      },
+      "required": [
+        "id",
+        "component",
+        "partySize"
+      ],
+      "additionalProperties": false
+    },
+    "RecommendationFilters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "component": {
+          "const": "RecommendationFilters"
+        },
+        "partySize": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12
+        },
+        "dietaryPreferences": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "excludedAllergens": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "allergenOptions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "maxCalories": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "budget": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "id",
+        "component",
+        "partySize",
+        "dietaryPreferences",
+        "excludedAllergens",
+        "allergenOptions",
+        "maxCalories",
+        "budget"
+      ],
+      "additionalProperties": false
+    },
+    "ServingInfo": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "component": {
+          "const": "ServingInfo"
+        },
+        "dishId": {
+          "type": "string"
+        },
+        "recommendedQuantity": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20
+        },
+        "partySize": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12
+        }
+      },
+      "required": [
+        "id",
+        "component",
+        "dishId",
+        "recommendedQuantity",
+        "partySize"
+      ],
+      "additionalProperties": false
+    },
+    "ReservationForm": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "component": {
+          "const": "ReservationForm"
+        },
+        "date": {
+          "type": "string"
+        },
+        "minDate": {
+          "type": "string"
+        },
+        "startTime": {
+          "type": "string"
+        },
+        "endTime": {
+          "type": "string"
+        },
+        "partySize": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12
+        }
+      },
+      "required": [
+        "id",
+        "component",
+        "date",
+        "minDate",
+        "startTime",
+        "endTime",
+        "partySize"
+      ],
+      "additionalProperties": false
+    },
+    "ReservationStatus": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "component": {
+          "const": "ReservationStatus"
+        },
+        "reservationId": {
+          "type": "string"
+        },
+        "tableId": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string"
+        },
+        "startTime": {
+          "type": "string"
+        },
+        "endTime": {
+          "type": "string"
+        },
+        "partySize": {
+          "type": "integer"
+        },
+        "seats": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "component",
+        "reservationId",
+        "tableId",
+        "date",
+        "startTime",
+        "endTime",
+        "partySize",
+        "seats"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

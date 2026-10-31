@@ -4,13 +4,15 @@ async function openChat(page:import('@playwright/test').Page){
 }
 async function ask(page:import('@playwright/test').Page,text:string){
  await openChat(page);
- const input=page.getByPlaceholder('What sounds good tonight?');
+ const input=page.getByTestId('copilot-chat-textarea');
  await input.fill(text);await input.press('Enter');
 }
 test('actual ADK tools render A2UI, add to server cart and confirm a demo order',async({page})=>{
  await page.goto('/');await expect(page.getByText('Mock Mode · scripted agent and UI fixtures. No live model generation.')).toBeVisible();
  await ask(page,'Show vegetarian dishes.');
  const surface=page.getByTestId('a2ui-surface').first();await expect(surface).toBeVisible();
+ await expect(page.locator('#dining-chat [data-testid="a2ui-surface"]').first()).toBeVisible();
+ await expect(page.locator('.dining-workspace')).toHaveCount(0);
  await expect(surface.getByRole('button',{name:'Add to cart'}).first()).toBeVisible();
  await surface.getByRole('button',{name:'Add to cart'}).first().click();
  await page.getByRole('button',{name:/Your table, \d+ items/}).click();

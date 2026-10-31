@@ -6,10 +6,10 @@ import {Skeleton} from './skeleton';
 
 export const InlineSurfaceContext=createContext<{
  byTool:Record<string,string[]>;surfaces:string[];loading:string[];failed:string[];
- retry:()=>void;busy:boolean;desktop:boolean;openTool:(id:string)=>void;collapsed:boolean;setCollapsed:(value:boolean)=>void;
-}>({byTool:{},surfaces:[],loading:[],failed:[],retry:()=>{},busy:false,desktop:false,openTool:()=>{},collapsed:false,setCollapsed:()=>{}});
+ retry:()=>void;busy:boolean;
+}>({byTool:{},surfaces:[],loading:[],failed:[],retry:()=>{},busy:false});
 
-const uiTools=new Set(['render_a2ui','recommend_dishes','quote_order','place_order','get_cart','update_cart','calculate_total_calories','show_reservation','check_reservation','reserve_table','mock_show_menu','ui_action']);
+const uiTools=new Set(['render_a2ui','recommend_dishes','quote_order','place_order','get_cart','update_cart','calculate_total_calories','show_reservation','check_reservation','reserve_table','mock_show_menu','handle_ui_action','generate_a2ui']);
 
 export function InlineToolResponse({toolCallId,name,status,result}:{toolCallId:string;name:string;status:string;result?:string}){
  const feed=useContext(InlineSurfaceContext);
@@ -18,7 +18,6 @@ export function InlineToolResponse({toolCallId,name,status,result}:{toolCallId:s
   if(!uiTools.has(name)||status==='complete')return null;
   return <div className="inline-loading"><Skeleton variant="line"/></div>;
  }
- if(feed.desktop)return <button className="inline-a2ui-mini" onClick={()=>feed.openTool(toolCallId)} aria-label="Open dining cards">Dining cards <span className="card-open-arrow" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></button>;
  return <SurfaceCards ids={ids}/>;
 }
 
